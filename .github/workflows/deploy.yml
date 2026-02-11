@@ -10,22 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Copy Website Files to EC2
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          source: "index.html"
-          target: "/var/www/html/"
-
-      - name: Restart Apache
+      - name: SSH into EC2 and Git Pull Latest Code
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
-          script: sudo systemctl restart apache2
+          script: |
+            cd /var/www/html
+            git pull origin main
+            sudo systemctl restart apache2
